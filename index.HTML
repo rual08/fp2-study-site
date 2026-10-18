@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FP2級勉強サイト - 過去問・徹底解説プラットフォーム</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Noto Sans JP -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Noto Sans JP"', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f8fafc; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between select-none">
+
+    <!-- ヘッダー -->
+    <header class="bg-gradient-to-r from-brand-800 to-brand-700 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="returnHome()">
+                <div class="bg-white text-brand-700 p-2 rounded-xl font-black text-xl shadow">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">FP2級勉強サイト</h1>
+                    <p class="text-xs text-brand-100 opacity-90">全6分野完全網羅・徹底解説プラットフォーム</p>
+                </div>
+            </div>
+            <div class="hidden sm:flex items-center space-x-4 text-xs bg-brand-900/40 px-3 py-1.5 rounded-lg border border-brand-600/30">
+                <div>総問題数: <span id="header-total-pool" class="font-bold text-white">0問</span></div>
+                <div>復習待ち: <span id="header-review-count" class="font-bold text-amber-300">0問</span></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メイン領域 -->
+    <main class="max-w-4xl w-full mx-auto px-4 py-6 flex-grow space-y-6">
+
+        <!-- 1. ホーム画面 -->
+        <div id="screen-home" class="space-y-6 fade-in">
+            <div class="bg-gradient-to-br from-brand-700 to-brand-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl space-y-3">
+                <span class="bg-brand-600 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">全6分野完全網羅・自己完結型</span>
+                <h2 class="text-2xl sm:text-3xl font-black leading-tight">FP2級学習プラットフォーム。</h2>
+                <p class="text-emerald-100 text-sm opacity-90 max-w-xl">
+                    ライフプランニング、金融、タックス、リスク、不動産、相続の全6分野の豊富な過去問・類題を収録。「正解の理由」「ひっかけの罠」「関連法令・周辺知識」の3本柱の徹底解説でFP2級合格をサポートします。
+                </p>
+            </div>
+
+            <!-- 復習リストバナー -->
+            <div id="resume-container" class="hidden bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 sm:p-5 shadow-sm flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-amber-900 text-base">前回の続きから再開できます</h3>
+                    <p id="resume-info-text" class="text-xs text-amber-700">進捗データが保存されています</p>
+                </div>
+                <button onclick="resumeQuiz()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-5 py-2.5 rounded-xl shadow text-sm">
+                    続きから再開
+                </button>
+            </div>
+
+            <!-- 条件設定カード -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                    <i class="fa-solid fa-sliders text-brand-600"></i>
+                    <span>学習条件の設定</span>
+                </h3>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-slate-700">分野を選択</label>
+                    <select id="select-category" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-700 font-medium focus:ring-2 focus:ring-brand-500">
+                        <option value="all">🌟 全分野（総合演習）</option>
+                        <option value="life">🏠 ライフプランニングと資金計画</option>
+                        <option value="financial">📈 金融資産運用</option>
+                        <option value="tax">💼 タックスプランニング</option>
+                        <option value="risk">🛡️ リスク管理</option>
+                        <option value="realestate">🏢 不動産</option>
+                        <option value="inheritance">📜 相続・事業承継</option>
+                    </select>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <button onclick="startQuiz('all')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transition flex items-center justify-center space-x-3 text-lg">
+                        <i class="fa-solid fa-circle-play"></i>
+                        <span>通常モードでスタート（10問）</span>
+                    </button>
+                    <button onclick="startQuiz('review')" id="btn-review-home" class="w-full bg-white border-2 border-amber-400 hover:bg-amber-50 text-amber-800 font-bold py-3.5 px-6 rounded-2xl shadow-sm transition flex items-center justify-between">
+                        <span>🎯 間違えた問題だけを復習する</span>
+                        <span id="review-count-label" class="text-xs bg-amber-100 px-2.5 py-1 rounded-full">復習待ち: 0問</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 運営者情報カード -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                    <i class="fa-solid fa-user-gear text-brand-600"></i>
+                    <span>運営者プロフィール</span>
+                </h3>
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-xl font-bold flex-shrink-0">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                    <div class="space-y-1 text-sm">
+                        <h4 class="font-bold text-slate-800">FP資格保有 ITエンジニア</h4>
+                        <p class="text-slate-600 leading-relaxed text-xs sm:text-sm">
+                            ファイナンシャル・プランニング技能士の知見とITエンジニアとしてのWeb開発ノウハウを活かし、学習効率を最大化する無料問題演習プラットフォームを開発・運営しています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. クイズ画面 -->
+        <div id="screen-quiz" class="hidden space-y-6 fade-in">
+            <div class="flex items-center justify-between bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-200">
+                <button onclick="returnHome()" class="text-xs font-semibold text-slate-500 hover:text-red-600">
+                    <i class="fa-solid fa-arrow-left"></i> 中断してホームへ
+                </button>
+                <div id="permalink-label" class="text-xs font-bold text-slate-700">
+                    問 1 / 10 （個別URL: /questions/1）
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <div class="flex justify-between items-center text-xs">
+                    <span id="quiz-category-badge" class="bg-brand-100 text-brand-800 font-bold px-3 py-1 rounded-full">分野名</span>
+                    <span id="quiz-diff-badge" class="text-amber-500 font-bold">難易度: ★★☆</span>
+                </div>
+
+                <h3 id="question-text" class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed">
+                    問題文がここに表示されます。
+                </h3>
+
+                <!-- 選択肢エリア -->
+                <div id="options-container" class="grid grid-cols-1 gap-3 pt-2">
+                    <!-- 動的生成 -->
+                </div>
+
+                <!-- 徹底解説ボックス（3本柱） -->
+                <div id="explanation-box" class="hidden space-y-4 pt-4 border-t border-slate-100 fade-in">
+                    <div id="result-badge" class="p-4 rounded-xl text-sm font-bold"></div>
+
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-4 text-sm">
+                        <div class="space-y-1">
+                            <h5 class="font-bold text-emerald-800 flex items-center space-x-1"><i class="fa-solid fa-circle-check"></i><span>① 正解の理由</span></h5>
+                            <p id="exp-reason" class="text-slate-700 leading-relaxed pl-5"></p>
+                        </div>
+                        <div class="space-y-1">
+                            <h5 class="font-bold text-rose-700 flex items-center space-x-1"><i class="fa-solid fa-triangle-exclamation"></i><span>② 受験者が最も引っかかる罠（ひっかけ）</span></h5>
+                            <p id="exp-trap" class="text-slate-700 leading-relaxed pl-5"></p>
+                        </div>
+                        <div class="space-y-1">
+                            <h5 class="font-bold text-blue-800 flex items-center space-x-1"><i class="fa-solid fa-book"></i><span>③ 関連法令・周辺知識</span></h5>
+                            <p id="exp-law" class="text-slate-700 leading-relaxed pl-5"></p>
+                        </div>
+                    </div>
+
+                    <!-- 収益化PR枠 -->
+                    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 sm:p-5 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded uppercase tracking-wider">PR / おすすめ</span>
+                            <span class="text-xs text-amber-700 font-medium">この分野の理解をさらに深めるなら</span>
+                        </div>
+                        <div id="random-ad-box-1" class="bg-white p-3.5 rounded-xl border border-amber-100 shadow-sm text-center flex justify-center items-center overflow-x-auto">
+                            <!-- 広告挿入箇所 -->
+                        </div>
+                    </div>
+
+                    <button onclick="nextQuestion()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-2xl shadow transition text-lg flex items-center justify-center space-x-2">
+                        <span>次の問題へ進む（Enterキー可）</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 結果画面 -->
+        <div id="screen-result" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 text-center space-y-6">
+                <div class="w-20 h-20 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-4xl mx-auto">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 class="text-2xl font-black text-slate-800">演習終了！お疲れ様でした</h2>
+                <p class="text-lg font-bold text-brand-700">正解数: <span id="result-score">0</span> / <span id="result-total">10</span>問</p>
+                
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-200 text-left space-y-2">
+                    <span class="text-[10px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded">PR</span>
+                    <h4 class="text-sm font-bold text-slate-800">お得な特典をチェック</h4>
+                    <div id="random-ad-box-2" class="text-xs text-brand-700 font-bold mt-1 flex justify-center items-center overflow-x-auto">
+                        <!-- 広告挿入箇所 -->
+                    </div>
+                </div>
+
+                <button onclick="returnHome()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow transition">
+                    ホームに戻る
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ポップアップ広告モーダル -->
+    <div id="ad-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden fade-in">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 relative">
+            <button onclick="closeAdModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center space-y-1 pt-2">
+                <span class="text-[10px] bg-amber-500 text-white font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">限定PR / おすすめ案内</span>
+                <h3 class="text-lg font-black text-slate-800">FP2級を一発合格したい方へ</h3>
+                <p class="text-xs text-slate-500">おすすめの特選商品・サービスをチェック！</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 space-y-3 text-center">
+                <div id="random-ad-box-modal" class="text-xs font-bold text-amber-800 flex justify-center items-center overflow-x-auto">
+                    <!-- 広告挿入箇所 -->
+                </div>
+            </div>
+
+            <button onclick="closeAdModal()" class="w-full text-xs text-slate-400 hover:text-slate-600 font-medium py-1">
+                閉じる（ホームへ戻る）
+            </button>
+        </div>
+    </div>
+
+    <!-- お問い合わせモーダル -->
+    <div id="contact-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden fade-in">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 relative max-h-[90vh] flex flex-col">
+            <button onclick="closeContactModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2 border-b pb-3">
+                <i class="fa-solid fa-envelope text-brand-600"></i>
+                <span>お問い合わせ</span>
+            </h3>
+            <div class="flex-grow overflow-y-auto">
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center space-y-3">
+                    <p class="text-xs text-slate-600">ご意見・ご感想・問題の修正依頼などは下記フォームよりお問い合わせください。</p>
+                    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfDdummyFormIdHere/viewform?embedded=true" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0" class="rounded-xl border border-slate-200">読み込み中…</iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- プライバシーポリシーモーダル -->
+    <div id="privacy-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden fade-in">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 relative max-h-[85vh] flex flex-col">
+            <button onclick="closePrivacyModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2 border-b pb-3">
+                <i class="fa-solid fa-shield-halved text-brand-600"></i>
+                <span>プライバシーポリシー</span>
+            </h3>
+            <div class="flex-grow overflow-y-auto text-xs text-slate-600 space-y-4 pr-2 leading-relaxed">
+                <section class="space-y-1">
+                    <h4 class="font-bold text-slate-800 text-sm">1. 個人情報の利用目的</h4>
+                    <p>当サイトでは、お問い合わせの際にお名前やメールアドレス等の個人情報をご入力いただく場合がございます。</p>
+                </section>
+                <section class="space-y-1">
+                    <h4 class="font-bold text-slate-800 text-sm">2. 広告の配信について</h4>
+                    <p>当サイトでは、第三者配信の広告サービスを利用する場合があります。</p>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- フッター -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-12 space-y-3">
+        <div class="flex items-center justify-center space-x-4 font-medium text-slate-600">
+            <button onclick="openPrivacyModal()" class="hover:text-brand-600 transition">プライバシーポリシー</button>
+            <span>|</span>
+            <button onclick="openContactModal()" class="hover:text-brand-600 transition">お問い合わせ</button>
+        </div>
+        <p>&copy; 2026 FP2級勉強サイト - 全6分野完全対応.</p>
+    </footer>
+
+    <!-- スクリプト＆広告データ・問題データ -->
+    <script>
+        // 広告リスト
+        const adList = [
+            { id: "banner-tossy", html: `<a href="https://px.a8.net/svt/ejp?a8mat=4BEET1+AO0LYQ+1WP2+1HNSR5" rel="nofollow" target="_blank"><img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=261012853645&wid=001&eno=01&mid=s00000008903009013000&mc=1"></a>` },
+            { id: "text-tossy", html: `<a href="https://px.a8.net/svt/ejp?a8mat=4BEET1+AO0LYQ+1WP2+1HMIGI" rel="nofollow" target="_blank" class="hover:underline text-xs sm:text-sm font-bold text-brand-700">【PR】ウルトラ投資アプリ【TOSSY】お得な特典が盛りだくさん！</a>` },
+            { id: "onsuku-text", html: `<a href="https://px.a8.net/svt/ejp?a8mat=4BEET1+DNS2GI+408S+5YJRM" rel="nofollow" target="_blank" class="hover:underline text-xs sm:text-sm font-bold text-brand-700">様々な資格学習が1078円でウケホーダイ！【オンスク.JP】</a>` },
+            { id: "onsuku-banner-300", html: `<a href="https://px.a8.net/svt/ejp?a8mat=4BEET1+DOYXO2+3L4C+601S1" rel="nofollow" target="_blank"><img border="0" width="300" height="250" alt="" src="https://www29.a8.net/svt/bgt?aid=261012853828&wid=001&eno=01&mid=s00000016734001008000&mc=1"></a>` }
+        ];
+
+        function getRandomAd() {
+            if (!adList || adList.length === 0) return "<p>おすすめ情報</p>";
+            const randomIndex = Math.floor(Math.random() * adList.length);
+            return adList[randomIndex].html;
+        }
+
+        // FP2級専用 問題データベース (全6分野・四肢択一/○×形式)
+        const fpQuestions = [
+            // 1. ライフプランニングと資金計画
+            {
+                id: 101, category: "life", categoryName: "ライフプランニングと資金計画", type: "ox",
+                question: "公的年金の老齢基礎年金は、受給資格期間が10年以上ある場合に原則として65歳から支給されるが、受給開始年齢の繰下げをした場合、増額率は最大で84％となる。",
+                options: null, answer: 0,
+                explanation: {
+                    reason: "65歳から最長75歳まで10年間（120ヶ月）繰り下げた場合、0.7% × 120ヶ月 ＝ 84%の増額率となります。",
+                    trap: "70歳繰下げ（最大42%）と勘違いさせるひっかけに注意。法改正により75歳（84%）まで拡大されています。",
+                    law: "国民年金法第28条の2"
+                }, difficulty: "★★☆"
+            },
+            {
+                id: 102, category: "life", categoryName: "ライフプランニングと資金計画", type: "4choice",
+                question: "日本FP協会の「資産設計提案業務」における各種係数の活用に関する説明として、最も適切なものはどれか。",
+                options: [
+                    "一定期間、一定利率で複利運用しながら毎年一定額を取り崩す場合の毎年受け取れる額を求めるには「年金現価係数」を用いる。",
+                    "一定期間後に目標とする額を複利運用で積立達成するために必要な毎年の積立額を求めるには「減価基金係数」を用いる。",
+                    "現在の資金を一定期間一定利率で複利運用したときの将来の元利合計額を求めるには「資本回収係数」を用いる。",
+                    "一定期間にわたり毎年一定額を積み立てた場合の将来の元利合計額を求めるには「終価係数」を用いる。"
+                ], answer: 1,
+                explanation: {
+                    reason: "目標額を積立達成するための毎年積立額は「減価基金係数」を用いて求めます。",
+                    trap: "「資本回収係数（取り崩しや元利均等返済）」と「減価基金係数（積立）」の混同を狙った選択肢が出題されます。",
+                    law: "6つの係数（FP実務基礎）"
+                }, difficulty: "★★☆"
+            },
+            {
+                id: 103, category: "life", categoryName: "ライフプランニングと資金計画", type: "ox",
+                question: "加給年金は、厚生年金保険の被保険者期間が20年以上ある者が、老齢厚生年金の受給権を取得した時点で、一定の条件を満たす配偶者または子がいる場合に加算される。",
+                options: null, answer: 0,
+                explanation: {
+                    reason: "加給年金の支給要件は「厚生年金被保険者期間20年以上」と「65歳到達時点での対象配偶者・子の存在」です。",
+                    trap: "被保険者期間を「10年以上」や「25年以上」とするひっかけが多発します。",
+                    law: "厚生年金保険法第44条"
+                }, difficulty: "★★☆" },
+
+            // 2. 金融資産運用
+            {
+                id: 201, category: "financial", categoryName: "金融資産運用", type: "ox",
+                question: "株式の投資指標であるPER（株価収益率）は「株価 ÷ 1株当たり純資産」で算出され、数値が高いほど割安と判断される。",
+                options: null, answer: 1,
+                explanation: {
+                    reason: "PERは「株価 ÷ 1株当たり利益（EPS）」で計算します。また、数値が低いほど割安、高いほど割高となります。",
+                    trap: "PBR（株価純資産倍率＝株価÷BPS）の定義との混同、および高低による割安・割高の逆転ひっかけです。",
+                    law: "財務指標分析（証券分析）"
+                }, difficulty: "★☆☆"
+            },
+            {
+                id: 202, category: "financial", categoryName: "金融資産運用", type: "4choice",
+                question: "ポートフォリオ理論に関する以下の記述のうち、最も適切なものはどれか。",
+                options: [
+                    "2資産間の相関係数が「+1」のとき、両資産を組み合わせることでリスク低減効果が最大化される。",
+                    "2資産間の相関係数が「-1」のとき、組み合わせにより理論上リスクをゼロにすることができる。",
+                    "2資産間の相関係数が「0」のときは、リスク分散効果が全く得られない。",
+                    "相関係数が「+1」を超える資産の組み合わせが存在する。"
+                ], answer: 1,
+                explanation: {
+                    reason: "相関係数が -1 の場合、完全に逆の値動きをするため、適切に比率を調整することでリスクを完全に相殺（ゼロに）できます。",
+                    trap: "「+1」のときはリスク低減効果が得られない（ゼロ）という点と混乱しないように注意しましょう。",
+                    law: "現代ポートフォリオ理論（MPT）"
+                }, difficulty: "★★☆"
+            },
+
+            // 3. タックスプランニング
+            {
+                id: 301, category: "tax", categoryName: "タックスプランニング", type: "ox",
+                question: "所得税において、個人が土地や建物などの不動産を売却したことによる譲渡所得は、他の所得と合算して総合課税の対象となる。",
+                options: null, answer: 1,
+                explanation: {
+                    reason: "土地・建物の譲渡所得は分離課税（申告分離課税）の対象であり、事業所得や給与所得等の総合課税対象とは合算しません。",
+                    trap: "総合課税（不動産所得・事業所得など）と分離課税（土地建物の譲渡所得など）の区分に関する出題です。",
+                    law: "租税特別措置法第31条"
+                }, difficulty: "★☆☆"
+            },
+            {
+                id: 302, category: "tax", categoryName: "タックスプランニング", type: "4choice",
+                question: "所得税における医療費控除に関する記述として、最も適切なものはどれか。",
+                options: [
+                    "その年中に支払った医療費の総額がそのまま控除額となる。",
+                    "保険金等で補填された金額を差し引いた後の金額から、原則として10万円（または総所得金額等の5%のいずれか低い方）を差引いて算出する。",
+                    "美容整形や健康診断（異常が見つからなかった場合）の費用も全額対象となる。",
+                    "控除限度額の上限は500万円に設定されている。"
+                ], answer: 1,
+                explanation: {
+                    reason: "医療費控除額 ＝ (支払った医療費 - 補填金) - 10万円（または総所得等の5%の低い方）です（上限200万円）。",
+                    trap: "治療目的でない美容整形や予防検診は対象外である点、上限が200万円である点に注意が必要です。",
+                    law: "所得税法第73条"
+                }, difficulty: "★★☆"
+            },
+
+            // 4. リスク管理
+            {
+                id: 401, category: "risk", categoryName: "リスク管理", type: "ox",
+                question: "生命保険の約款における「免責期間」中に被保険者が自殺した場合、保険会社は死亡保険金を支払う義務を負わない。",
+                options: null, answer: 0,
+                explanation: {
+                    reason: "免責期間（通常1〜3年程度）内の自殺については、保険金の支払対象外（免責）となります。",
+                    trap: "免責期間経過後であれば自殺であっても支払対象となる点もFP2級の頻出論点です。",
+                    law: "保険法第51条"
+                }, difficulty: "★☆☆"
+            },
+
+            // 5. 不動産
+            {
+                id: 501, category: "realestate", categoryName: "不動産", type: "4choice",
+                question: "建築基準法における建蔽率（建ぺい率）および容積率に関する記述として、最も適切なものはどれか。",
+                options: [
+                    "建蔽率とは、敷地面積に対する建築物の延べ面積の割合をいう。",
+                    "容積率は、敷地面積に対する建築物の建築面積の割合をいう。",
+                    "建築物が防火地域内にあり、かつ耐火建築物等である場合、建蔽率の緩和措置を受けることができる。",
+                    "前面道路の幅員による容積率の制限は、前面道路の幅員が15m以上の場合に適用される。"
+                ], answer: 2,
+                explanation: {
+                    reason: "防火地域内の耐火建築物は建蔽率が10%加算（一定条件下で100%適用）される緩和措置があります。",
+                    trap: "選択肢1と2は「建蔽率（建築面積÷敷地面積）」と「容積率（延べ面積÷敷地面積）」の定義が逆になっています。",
+                    law: "建築基準法第52条・第53条"
+                }, difficulty: "★★☆"
+            },
+
+            // 6. 相続・事業承継
+            {
+                id: 601, category: "inheritance", categoryName: "相続・事業承継", type: "ox",
+                question: "遺言の方式のうち「公正証書遺言」は、証人2人以上の立会いのもとで公証人が作成するため、家庭裁判所による検認手続きが不要である。",
+                options: null, answer: 0,
+                explanation: {
+                    reason: "公正証書遺言は公証人が関与して作成されるため、改ざんのリスクがなく、家庭裁判所の検認が不要です（自筆証書遺言は原則検認が必要）。",
+                    trap: "法務局で保管された自筆証書遺言も検認不要となりましたが、公正証書遺言は元々検認不要です。",
+                    law: "民法第1004条"
+                }, difficulty: "★☆☆"
+            }
+        ];
+
+        // 状態管理
+        let currentPool = [];
+        let currentIndex = 0;
+        let score = 0;
+        let wrongQuestions = JSON.parse(localStorage.getItem("fp2_review_list") || "[]");
+
+        function updateHeaderInfo() {
+            document.getElementById("header-total-pool").textContent = `${fpQuestions.length}問`;
+            document.getElementById("header-review-count").textContent = `${wrongQuestions.length}問`;
+            document.getElementById("review-count-label").textContent = `復習待ち: ${wrongQuestions.length}問`;
+        }
+
+        function startQuiz(mode) {
+            const selectedCat = document.getElementById("select-category").value;
+            let filtered = fpQuestions;
+
+            if (selectedCat !== "all") {
+                filtered = fpQuestions.filter(q => q.category === selectedCat);
+            }
+
+            if (mode === 'review') {
+                filtered = fpQuestions.filter(q => wrongQuestions.includes(q.id));
+                if (filtered.length === 0) {
+                    alert("復習が必要な問題はありません！");
+                    return;
+                }
+            }
+
+            // シャッフルして10問抽出
+            currentPool = [...filtered].sort(() => Math.random() - 0.5).slice(0, 10);
+            currentIndex = 0;
+            score = 0;
+
+            document.getElementById("screen-home").classList.add("hidden");
+            document.getElementById("screen-result").classList.add("hidden");
+            document.getElementById("screen-quiz").classList.remove("hidden");
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = currentPool[currentIndex];
+            document.getElementById("permalink-label").textContent = `問 ${currentIndex + 1} / ${currentPool.length} （問題ID: #${q.id}）`;
+            document.getElementById("quiz-category-badge").textContent = q.categoryName;
+            document.getElementById("quiz-diff-badge").textContent = `難易度: ${q.difficulty}`;
+            document.getElementById("question-text").textContent = q.question;
+
+            const container = document.getElementById("options-container");
+            container.innerHTML = "";
+            document.getElementById("explanation-box").classList.add("hidden");
+
+            if (q.type === "ox") {
+                const btnO = createOptionButton("〇 正しい", 0);
+                const btnX = createOptionButton("✕ 誤り", 1);
+                container.appendChild(btnO);
+                container.appendChild(btnX);
+            } else if (q.type === "4choice" || q.type === "3choice") {
+                q.options.forEach((opt, idx) => {
+                    const btn = createOptionButton(`${idx + 1}. ${opt}`, idx);
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        function createOptionButton(text, index) {
+            const btn = document.createElement("button");
+            btn.className = "w-full text-left bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 rounded-2xl p-4 font-medium transition text-slate-800 text-sm";
+            btn.textContent = text;
+            btn.onclick = () => checkAnswer(index);
+            return btn;
+        }
+
+        function checkAnswer(selectedIndex) {
+            const q = currentPool[currentIndex];
+            const isCorrect = selectedIndex === q.answer;
+
+            const box = document.getElementById("explanation-box");
+            const badge = document.getElementById("result-badge");
+
+            if (isCorrect) {
+                score++;
+                badge.className = "p-4 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-800 border border-emerald-200";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 正解です！`;
+                // 復習リストから削除
+                wrongQuestions = wrongQuestions.filter(id => id !== q.id);
+            } else {
+                badge.className = "p-4 rounded-xl text-sm font-bold bg-rose-100 text-rose-800 border border-rose-200";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> 不正解です…（正解: ${q.type === 'ox' ? (q.answer === 0 ? '〇' : '✕') : q.answer + 1}）`;
+                // 復習リストに追加
+                if (!wrongQuestions.includes(q.id)) {
+                    wrongQuestions.push(q.id);
+                }
+            }
+
+            localStorage.setItem("fp2_review_list", JSON.stringify(wrongQuestions));
+            updateHeaderInfo();
+
+            document.getElementById("exp-reason").textContent = q.explanation.reason;
+            document.getElementById("exp-trap").textContent = q.explanation.trap;
+            document.getElementById("exp-law").textContent = q.explanation.law;
+
+            document.getElementById("random-ad-box-1").innerHTML = getRandomAd();
+
+            // 選択肢の無効化
+            const container = document.getElementById("options-container");
+            Array.from(container.children).forEach(btn => btn.disabled = true);
+
+            box.classList.remove("hidden");
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < currentPool.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById("screen-quiz").classList.add("hidden");
+            document.getElementById("screen-result").classList.remove("hidden");
+            document.getElementById("result-score").textContent = score;
+            document.getElementById("result-total").textContent = currentPool.length;
+            document.getElementById("random-ad-box-2").innerHTML = getRandomAd();
+
+            // 結果画面モーダル広告を表示
+            setTimeout(() => {
+                openAdModal();
+            }, 600);
+        }
+
+        function returnHome() {
+            document.getElementById("screen-quiz").classList.add("hidden");
+            document.getElementById("screen-result").classList.add("hidden");
+            document.getElementById("screen-home").classList.remove("hidden");
+            updateHeaderInfo();
+        }
+
+        // モーダル操作
+        function openAdModal() {
+            document.getElementById("random-ad-box-modal").innerHTML = getRandomAd();
+            document.getElementById("ad-modal").classList.remove("hidden");
+        }
+        function closeAdModal() { document.getElementById("ad-modal").classList.add("hidden"); }
+        function openContactModal() { document.getElementById("contact-modal").classList.remove("hidden"); }
+        function closeContactModal() { document.getElementById("contact-modal").classList.add("hidden"); }
+        function openPrivacyModal() { document.getElementById("privacy-modal").classList.remove("hidden"); }
+        function closePrivacyModal() { document.getElementById("privacy-modal").classList.add("hidden"); }
+
+        // キーボード操作対応 (Enterキーで次へ)
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                const box = document.getElementById("explanation-box");
+                if (box && !box.classList.contains("hidden")) {
+                    nextQuestion();
+                }
+            }
+        });
+
+        // 初期化
+        updateHeaderInfo();
+    </script>
+</body>
+</html>
