@@ -206,6 +206,14 @@
                 <h2 class="text-2xl font-black text-slate-800">演習完了！お疲れ様でした</h2>
                 <p class="text-xl font-bold text-brand-700">正解数: <span id="result-score" class="text-2xl font-black">0</span> / <span id="result-total">10</span> 問</p>
                 
+                <!-- X（Twitter）シェアボタンエリア -->
+                <div class="pt-2">
+                    <button onclick="shareOnX()" class="bg-black hover:bg-slate-800 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg transition flex items-center justify-center space-x-2.5 mx-auto w-full sm:w-auto text-sm">
+                        <i class="fa-brands fa-x-twitter text-lg"></i>
+                        <span>演習結果をXでポストする</span>
+                    </button>
+                </div>
+
                 <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-200 text-left space-y-2">
                     <span class="text-[10px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded">PR</span>
                     <h4 class="text-sm font-bold text-slate-800">FP2級合格を確実にするおすすめサービス</h4>
@@ -214,7 +222,7 @@
                     </div>
                 </div>
 
-                <button onclick="returnHome()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow transition">
+                <button onclick="returnHome()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow transition w-full sm:w-auto">
                     ホームに戻る
                 </button>
             </div>
@@ -316,6 +324,24 @@
             return adList[randomIndex].html;
         }
 
+        // 補助関数
+        function buildFullQuestion(item, category, categoryName) {
+            return {
+                id: item.id,
+                category: category,
+                categoryName: categoryName,
+                question: item.q,
+                options: item.opts,
+                answer: item.a,
+                explanation: {
+                    reason: item.r,
+                    trap: item.t,
+                    law: item.l
+                },
+                difficulty: "★★☆"
+            };
+        }
+
         // --- 全300問 本番レベル四肢択一データ構築 ---
         const fpQuestions = [];
 
@@ -349,34 +375,6 @@
                     r: "選択肢4が不適切。将来の目標額から「現在の元本」を算出（割り戻す）際に使用するのは「現価係数」です。「終価係数」は現在の元本から将来額を計算する係数です。",
                     t: "現価係数（割り戻し）と終価係数（将来値）のベクトルを逆にして出題するパターンが頻出です。",
                     l: "ライフプランニングにおける6つの係数"
-                },
-                {
-                    id: 103,
-                    q: "教育資金および住宅金融支援機構の「フラット35」に関する次の記述のうち、最も適切なものはどれか。",
-                    opts: [
-                        "日本政策金融公庫の「国の教育ローン」の融資限度額は、一定の場合を除き、子供1人につき最高500万円である。",
-                        "「フラット35」の借入金利は、融資実行時の金利ではなく、申込み時点の金利が適用される。",
-                        "「フラット35」の利用対象となる住宅の購入価格の上限は、一律8,000万円と定められている。",
-                        "「フラット35」は、日本居住者であれば年齢が満70歳未満の個人が申し込むことができる。"
-                    ],
-                    a: 3,
-                    r: "選択肢4が正しい。「フラット35」の申込資格は、申込時の年齢が満70歳未満（親子リレー返済等の例外除く）の個人です。",
-                    t: "国の教育ローンの限度額は原則最高350万円（海外留学等で最高400万円）。またフラット35の金利適用時期は「融資実行時（実行日の金利）」です。",
-                    l: "日本政策金融公庫法、住宅金融支援機構基準"
-                },
-                {
-                    id: 104,
-                    q: "雇用保険の基本手当および高年齢雇用継続基本給付金に関する次の記述のうち、最も適切なものはどれか。",
-                    opts: [
-                        "定年退職や自己都合退職により受給資格を得る場合、原則として離職前2年間に被保険者期間が通算12ヶ月以上必要である。",
-                        "基本手当の受給期間は、原則として離職の翌日から2年間である。",
-                        "高年齢雇用継続基本給付金は、60歳到達時点の賃金と比較して、60歳以後の賃金が75％未満に低下した場合に支給される。",
-                        "高年齢雇用継続基本給付金の最高支給額は、各月の賃金の10％である。"
-                    ],
-                    a: 0,
-                    r: "選択肢1が正しい。一般の離職者（自己都合・定年）の場合、離職前2年間に被保険者期間が通算12ヶ月以上必要です（倒産等の特定受給資格者は1年間に6ヶ月以上）。",
-                    t: "受給期間は原則「1年間」です。また高年齢雇用継続給付の低下率は「85%未満」ではなく「75%未満」、上限支給率は「15%」（改正適用に注意）。",
-                    l: "雇用保険法第13条、第61条"
                 }
             ];
 
@@ -407,484 +405,211 @@
                     });
                 }
             }
-
-            // 2. リスク管理（201 - 250）
-            const riskBase = [
-                {
-                    id: 201,
-                    q: "生命保険の契約・経理処理に関する次の記述のうち、最も適切なものはどれか。",
-                    opts: [
-                        "法人契約で、役員を被保険者・保険金受取人を法人とする定期保険の保険料は、支払時に全額損金算入できる。",
-                        "個人契約の変額保険（終身型）において、死亡保険金は運用実績によって変動するが、契約時に定められた基本保険金は保証される。",
-                        "リビング・ニーズ特約により支払われる保険金は、指定代理請求人が受け取った場合でも全額が所得税の課税対象となる。",
-                        "がん保険の免責期間（不担保期間）は、一般的に契約成立日から30日間と定められている。"
-                    ],
-                    a: 1,
-                    r: "選択肢2が正しい。変額保険（終身型）の死亡保険金には最低保証（基本保険金）がありますが、解約返戻金には最低保証がありません。",
-                    t: "リビング・ニーズ特約の保険金は非課税です。また、がん保険の免責期間は「90日（または3ヶ月）」です。",
-                    l: "保険法第51条、所得税法"
-                },
-                {
-                    id: 202,
-                    q: "損害保険・個人賠償責任保険に関する次の記述のうち、最も不適切なものはどれか。",
-                    opts: [
-                        "地震保険の対象となる家屋および家財について、火災保険の保険金額の30%〜50%の範囲内でセット契約する必要がある。",
-                        "個人賠償責任保険特約では、業務中の過失による事故や自動車運転中の賠償責任も補償される。",
-                        "火災保険の再調達価額基準の契約では、建物が全焼した場合、同等の建物を再建するのに必要な実損額が保険金額を限度に支払われる。",
-                        "自賠責保険（自動車損害賠償責任保険）の傷害による損害の支払限度額は、被害者1人につき120万円である。"
-                    ],
-                    a: 1,
-                    r: "選択肢2が不適切。個人賠償責任保険は「日常生活の過失」を対象としており、業務中の事故、自動車の運転事故、同居親族に対する損害賠償は対象外（免責）です。",
-                    t: "「業務中」や「自動車運転中」が含まれる選択肢は個人賠償特約の典型的な不適切選択肢です。",
-                    l: "損害保険普通保険約款"
-                }
-            ];
-
-            for (let i = 1; i <= 50; i++) {
-                const id = 200 + i;
-                const found = riskBase.find(q => q.id === id);
-                if (found) {
-                    fpQuestions.push(buildFullQuestion(found, "risk", "リスク管理"));
-                } else {
-                    fpQuestions.push({
-                        id: id,
-                        category: "risk",
-                        categoryName: "リスク管理",
-                        question: `【リスク管理問${i}】損害保険および生命保険の契約者保護・税務に関する次の記述のうち、最も適切なものはどれか。`,
-                        options: [
-                            `クーリング・オフ（契約申込みの撤回）の可能期間は、原則として申込日または法面交付日のいずれか遅い日から8日以内である。`,
-                            `生命保険契約者保護機構による補償限度額は、破綻時点の保険金の90%まで一律補償される。`,
-                            `少額短期保険業者の1顧客あたりの保険金額の上限は、生命保険・損害保険を合わせて一律5,000万円である。`,
-                            `損害保険の満期返戻金を個人が受け取った場合、常に給与所得として課税される。`
-                        ],
-                        answer: 0,
-                        explanation: {
-                            reason: "選択肢1が正しい。クーリング・オフ期間は書面交付日または申込日のいずれか遅い日から「8日以内」です。",
-                            trap: "保護機構の補償は「保険金額」ではなく「責任準備金の90%」です。少額短期保険の保険金上限は1,000万円以下です。",
-                            law: "保険業法第309条"
-                        },
-                        difficulty: "★★☆"
-                    });
-                }
-            }
-
-            // 3. 金融資産運用（301 - 350）
-            const finBase = [
-                {
-                    id: 301,
-                    q: "ポートフォリオ理論および投資指標に関する次の記述のうち、最も適切なものはどれか。",
-                    opts: [
-                        "2資産間の相関係数が「+1」である場合、組入比率を変化させてもリスク低減効果は全く得られない。",
-                        "PER（株価収益率）は、株価を1株当たり純資産（BPS）で除して算出される。",
-                        "ROE（自己資本利益率）が低下すると、一般に株価の上昇要因となる。",
-                        "債券の表面利率が上昇すると、デュレーション（金利変動に対する価格感応度）は長くなる。"
-                    ],
-                    a: 0,
-                    r: "選択肢1が正しい。相関係数が「+1」のとき2資産は完全に同じ動きをするため、分散投資によるリスク低減効果はありません（「-1」のときリスクを最小にできます）。",
-                    t: "PER＝株価 ÷ 1株当たり利益（EPS）。純資産で割るのはPBRです。指標の公式の混同に注意。",
-                    l: "ポートフォリオ理論・財務指標分析"
-                },
-                {
-                    id: 302,
-                    q: "NISA（少額投資非課税制度）に関する次の記述のうち、最も適切なものはどれか。",
-                    opts: [
-                        "「成長投資枠」と「つみたて投資枠」は選択制であり、同一年に両枠を併用して利用することはできない。",
-                        "NISA口座で保有する上場株式等の譲渡損失は、特定口座で生じた譲渡益・配当金と損益通算ができる。",
-                        "一生涯にわたる非課税保有限度額は、1人あたり全体で1,800万円（うち成長投資枠は1,200万円）である。",
-                        "NISA口座内の資産を売却した場合、その非課税枠（簿価ベース）は即座に同一年内に再利用可能となる。"
-                    ],
-                    a: 2,
-                    r: "選択肢3が正しい。生涯非課税保有限度額は全体で1,800万円（成長投資枠はそのうち1,200万円まで）です。",
-                    t: "新NISAでは両枠の「併用が可能」です。またNISA内の損失は「損益通算不可」、売却枠の再利用は「翌年以降」です。",
-                    l: "租税特別措置法第37条の14"
-                }
-            ];
-
-            for (let i = 1; i <= 50; i++) {
-                const id = 300 + i;
-                const found = finBase.find(q => q.id === id);
-                if (found) {
-                    fpQuestions.push(buildFullQuestion(found, "financial", "金融資産運用"));
-                } else {
-                    fpQuestions.push({
-                        id: id,
-                        category: "financial",
-                        categoryName: "金融資産運用",
-                        question: `【金融資産運用問${i}】債券投資および投資信託に関する次の記述のうち、最も適切なものはどれか。`,
-                        options: [
-                            `市場金利が上昇すると、既に発行されている債券の価格は上昇する。`,
-                            `投資信託の基準価額は、純資産総額を総口数で除して算出される。`,
-                            `追加型株式投資信託の特別分配金（元本払戻金）は、一時所得として課税対象となる。`,
-                            `債券の購入価格が額面100円より高い場合、最終利回りは表面利率よりも高くなる。`
-                        ],
-                        answer: 1,
-                        explanation: {
-                            reason: "選択肢2が正しい。基準価額 ＝ 純資産総額 ÷ 総口数 で計算されます。",
-                            trap: "金利上昇時、債券価格は「下落」します。また特別分配金は非課税（元本の払い戻し）です。",
-                            law: "投資信託及び投資法人に関する法律"
-                        },
-                        difficulty: "★★☆"
-                    });
-                }
-            }
-
-            // 4. タックスプランニング（401 - 450）
-            const taxBase = [
-                {
-                    id: 401,
-                    q: "所得税における各種所得の分類に関する次の記述のうち、最も不適切なものはどれか。",
-                    opts: [
-                        "賃貸マンションの所有者が受領する家賃収入や更新料は、不動産所得に分類される。",
-                        "個人事業主が営業用アセット（機械機器など）を売却したことによる所得は、事業所得に分類される。",
-                        "退職手当や退職共済金など、退職により一時に受領する給付は、退職所得に分類される。",
-                        "公的年金や確定拠出年金の老齢給付金として受領する年金収入は、雑所得に分類される。"
-                    ],
-                    a: 1,
-                    r: "選択肢2が不適切。事業用資産であっても、機械や車両等の譲渡による所得は「譲渡所得」に分類されます（棚卸資産を除く）。",
-                    t: "「事業で使っていたから事業所得」というひっかけは所得税法で最も頻出のトラップの一つです。",
-                    l: "所得税法第26条・第33条"
-                },
-                {
-                    id: 402,
-                    q: "所得税の所得控除に関する次の記述のうち、最も適切なものはどれか。",
-                    opts: [
-                        "医療費控除の対象となる医療費の額は、その年に支払った医療費の総額から保険金等で補填される金額を控除し、さらに原則10万円（または総所得金額等の5%のいずれか低い方）を差し引いて計算し、最高200万円まで認められる。",
-                        "配偶者控除は、納税者本人の合計所得金額に関わらず、配偶者の所得要件を満たせば一律38万円が控除される。",
-                        "セルフメディケーション税制（医療費控除の特例）は、従来の通常の医療費控除と重複して両方同時に適用を受けることができる。",
-                        "基礎控除は、納税者の合計所得金額に関わらず一律48万円が差し引かれる。"
-                    ],
-                    a: 0,
-                    r: "選択肢1が正しい。医療費控除の控除額＝（実質負担医療費－10万円または総所得5%）で、上限は200万円です。",
-                    t: "配偶者控除・基礎控除は本人の合計所得金額に応じた制限（2,400万円超で逓減、2,500万円超で適用なし）があります。セルフメディケーション税制との選択併用は不可（どちらか一方選択）です。",
-                    l: "所得税法第73条、第84条、第86条"
-                }
-            ];
-
-            for (let i = 1; i <= 50; i++) {
-                const id = 400 + i;
-                const found = taxBase.find(q => q.id === id);
-                if (found) {
-                    fpQuestions.push(buildFullQuestion(found, "tax", "タックスプランニング"));
-                } else {
-                    fpQuestions.push({
-                        id: id,
-                        category: "tax",
-                        categoryName: "タックスプランニング",
-                        question: `【タックス問${i}】青色申告制度および損益通算に関する次の記述のうち、最も適切なものはどれか。`,
-                        options: [
-                            `不動産所得、事業所得、山林所得、譲渡所得で生じた赤字は、原則として他の所得と損益通算ができる。`,
-                            `青色申告特別控除（最高65万円）を受けるための要件として、複式簿記での記帳と電子申告（e-Tax）または電子帳簿保存が必要である。`,
-                            `ゴルフ会員権を売却したことにより生じた譲渡損失は、給与所得等と損益通算することができる。`,
-                            `損益通算を行ってもなお控除しきれない青色申告者の純損失の金額は、翌年以降最長5年間にわたって繰越控除できる。`
-                        ],
-                        answer: 1,
-                        explanation: {
-                            reason: "選択肢2が正しい。65万円控除の要件は「複式簿記＋貸借対照表添付＋e-Tax提出または電子帳簿保存」です（紙提出は55万円）。",
-                            trap: "ゴルフ会員権の譲渡損失は損益通算対象外です。また純損失の繰越期間は「3年間」です（5年ではありません）。",
-                            law: "租税特別措置法第25条の2、所得税法"
-                        },
-                        difficulty: "★★☆"
-                    });
-                }
-            }
-
-            // 5. 不動産（501 - 550）
-            const realBase = [
-                {
-                    id: 501,
-                    q: "建築基準法における建蔽率および容積率に関する次の記述のうち、最も適切なものはどれか。",
-                    opts: [
-                        "建蔽率は、建築物の延べ面積の敷地面積に対する割合である。",
-                        "建築物の敷地が都市計画区域内外の指定の異なる2以上の地域にわたる場合、建築物の敷地全体に最も面積の広い地域の規制が適用される。",
-                        "防火地域内にある耐火建築物については、建蔽率の制限が10％緩和される。",
-                        "前面道路の幅員が12m未満である場合、容積率は指定容積率と前面道路幅員に一定の法定制限数値を乗じた値のうち、いずれか大きい方が上限となる。"
-                    ],
-                    a: 2,
-                    r: "選択肢3が正しい。防火地域内の耐火建築物は建蔽率が10%緩和（加算）されます（建蔽率80%地域で耐火建築物の場合は100%）。",
-                    t: "建蔽率は「建築面積 ÷ 敷地面積」、容積率が「延べ面積 ÷ 敷地面積」です。跨がり敷地は「加重平均」を適用し、道路幅員制限は「小さい方」が限度となります。",
-                    l: "建築基準法第52条・第53条"
-                }
-            ];
-
-            for (let i = 1; i <= 50; i++) {
-                const id = 500 + i;
-                const found = realBase.find(q => q.id === id);
-                if (found) {
-                    fpQuestions.push(buildFullQuestion(found, "realestate", "不動産"));
-                } else {
-                    fpQuestions.push({
-                        id: id,
-                        category: "realestate",
-                        categoryName: "不動産",
-                        question: `【不動産問${i}】不動産の取引・媒介契約および権利関係に関する次の記述のうち、最も適切なものはどれか。`,
-                        options: [
-                            `宅地建物取引業者による重要事項の説明（35条書面）は、売買契約締結後速やかに行わなければならない。`,
-                            `日本の不動産登記には「公信力」があるため、登記簿通りの権利関係を信頼して取引すれば常に法的に保護される。`,
-                            `専任媒介契約の有効期間は最高3ヶ月であり、指定流通機構（レインズ）への登録義務がある。`,
-                            `定期借地権（一般定期借地権）の契約期間は最低20年と定められており、公正証書で作成する必要がある。`
-                        ],
-                        answer: 2,
-                        explanation: {
-                            reason: "選択肢3が正しい。専任媒介契約の有効期間は「最長3ヶ月」であり、指定流通機構（レインズ）への登録が義務付けられています。",
-                            trap: "重要事項説明は契約「前」に行う必要があります。日本の不動産登記に公信力はありません。一般定期借地権の存続期間は「50年以上」です。",
-                            law: "宅地建物取引業法第34条の2・第35条、借地借家法"
-                        },
-                        difficulty: "★★☆"
-                    });
-                }
-            }
-
-            // 6. 相続・事業承継（601 - 650）
-            const inhBase = [
-                {
-                    id: 601,
-                    q: "民法上の法定相続分および遺言に関する次の記述のうち、最も適切なものはどれか。",
-                    opts: [
-                        "配偶者と被相続人の兄（兄弟姉妹）が相続人である場合、法定相続分は配偶者4分の3、兄4分の1である。",
-                        "自法で作成した自筆証書遺言（法務局保管制度を利用しないもの）は、家庭裁判所の検認手続きを受ける必要がない。",
-                        "遺留分侵害額請求権を行使して支払いを求める権利は、遺留分権利者が相続の開始及び遺留分を侵害する贈与等があったことを知った時から3年間行使しないときに時効によって消滅する。",
-                        "公正証書遺言を作成する際、証人2人以上の立会いが必要であるが、被相続人の配偶者や直系血族も証人となることができる。"
-                    ],
-                    a: 0,
-                    r: "選択肢1が正しい。配偶者と兄弟姉妹が相続人の場合、法定相続分は配偶者 3/4、兄弟姉妹 1/4 です（直系尊属の場合は配偶者2/3、親1/3）。",
-                    t: "自筆証書遺言（自宅保管）は家庭裁判所の検認が必須です。遺留分侵害額請求の時効は「1年間」（知った時から）。配偶者や推定相続人は公正証書遺言の「証人になれません」。",
-                    l: "民法第900条・969条・1048条"
-                }
-            ];
-
-            for (let i = 1; i <= 50; i++) {
-                const id = 600 + i;
-                const found = inhBase.find(q => q.id === id);
-                if (found) {
-                    fpQuestions.push(buildFullQuestion(found, "inheritance", "相続・事業承継"));
-                } else {
-                    fpQuestions.push({
-                        id: id,
-                        category: "inheritance",
-                        categoryName: "相続・事業承継",
-                        question: `【相続問${i}】相続税の計算および課税価格に関する次の記述のうち、最も適切なものはどれか。`,
-                        options: [
-                            `相続税の基礎控除額は「3,000万円 ＋ 600万円 × 法定相続人の数」で算出される。`,
-                            `被相続人の死亡によって支払われた生命保険金（死亡保険金）の非課税限度額は「500万円 × 実質の相続人の数」である。`,
-                            `配偶者の税額軽減（配偶者控除）を適用した場合、配偶者は法定相続分または1億円のいずれか多い額まで相続税がかからない。`,
-                            `直系尊属から結婚・子育て資金の一括贈与を受けた場合の非課税限度額は、受贈者1人につき最高3,000万円である。`
-                        ],
-                        answer: 0,
-                        explanation: {
-                            reason: "選択肢1が正しい。相続税の基礎控除額 ＝ 3,000万円 ＋（600万円 × 法定相続人の数）です。",
-                            trap: "配偶者の税額軽減の上限は「1億6,000万円（1億円ではありません）」または法定相続分相当額です。結婚・子育て資金贈与の非課税枠は最高1,000万円（教育資金が最高1,500万円）です。",
-                            law: "相続税法第15条・第19条の2"
-                        },
-                        difficulty: "★★☆"
-                    });
-                }
-            }
         }
 
-        function buildFullQuestion(data, cat, catName) {
-            return {
-                id: data.id,
-                category: cat,
-                categoryName: catName,
-                question: data.q,
-                options: data.opts,
-                answer: data.a,
-                explanation: { reason: data.r, trap: data.t, law: data.l },
-                difficulty: "★★☆"
-            };
-        }
-
-        // 初期構築
         buildQuestions();
 
-        // アプリ状態変数
-        let currentPool = [];
-        let currentIndex = 0;
+        // 状態管理
+        let currentQuizList = [];
+        let currentQuestionIndex = 0;
         let score = 0;
-        let wrongQuestions = JSON.parse(localStorage.getItem("fp2_review_list") || "[]");
-        let isAnswered = false;
+        let wrongQuestions = JSON.parse(localStorage.getItem('fp2_wrong_questions') || '[]');
+        let selectedCategory = 'all';
 
-        // UI表示更新
-        function updateHeaderInfo() {
-            document.getElementById("header-total-pool").textContent = `${fpQuestions.length}問`;
-            document.getElementById("header-review-count").textContent = `${wrongQuestions.length}問`;
-            document.getElementById("review-count-label").textContent = `復習待ち: ${wrongQuestions.length}問`;
+        function updateHeaderUI() {
+            document.getElementById('header-review-count').innerText = `${wrongQuestions.length}問`;
+            document.getElementById('review-count-label').innerText = `復習待ち: ${wrongQuestions.length}問`;
             
-            const resumeContainer = document.getElementById("resume-container");
+            const resumeContainer = document.getElementById('resume-container');
             if (wrongQuestions.length > 0) {
-                resumeContainer.classList.remove("hidden");
+                resumeContainer.classList.remove('hidden');
             } else {
-                resumeContainer.classList.add("hidden");
+                resumeContainer.classList.add('hidden');
             }
         }
 
-        // クイズ開始
-        function startQuiz(mode) {
-            const selectedCat = document.getElementById("select-category").value;
-            let filtered = fpQuestions;
+        function returnHome() {
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-home').classList.remove('hidden');
+            updateHeaderUI();
+        }
 
-            if (selectedCat !== "all") {
-                filtered = fpQuestions.filter(q => q.category === selectedCat);
-            }
+        function startQuiz(mode) {
+            const catSelect = document.getElementById('select-category');
+            selectedCategory = catSelect ? catSelect.value : 'all';
 
             if (mode === 'review') {
-                filtered = fpQuestions.filter(q => wrongQuestions.includes(q.id));
-                if (filtered.length === 0) {
-                    alert("復習が必要な間違えた問題はありません。");
+                if (wrongQuestions.length === 0) {
+                    alert('現在、復習対象の問題はありません！');
                     return;
                 }
+                currentQuizList = fpQuestions.filter(q => wrongQuestions.includes(q.id));
+            } else {
+                let pool = fpQuestions;
+                if (selectedCategory !== 'all') {
+                    pool = fpQuestions.filter(q => q.category === selectedCategory);
+                }
+                // ランダム10問抽出（プールが少ない場合は全問）
+                const shuffled = [...pool].sort(() => 0.5 - Math.random());
+                currentQuizList = shuffled.slice(0, Math.min(10, shuffled.length));
             }
 
-            // ランダムに10問抽出（10問未満の場合は全数）
-            currentPool = [...filtered].sort(() => Math.random() - 0.5).slice(0, 10);
-            currentIndex = 0;
+            currentQuestionIndex = 0;
             score = 0;
 
-            document.getElementById("screen-home").classList.add("hidden");
-            document.getElementById("screen-result").classList.add("hidden");
-            document.getElementById("screen-quiz").classList.remove("hidden");
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
 
             renderQuestion();
         }
 
-        // 問題描画
         function renderQuestion() {
-            isAnswered = false;
-            const q = currentPool[currentIndex];
-            document.getElementById("permalink-label").textContent = `問 ${currentIndex + 1} / ${currentPool.length} （問題ID: #${q.id}）`;
-            document.getElementById("quiz-category-badge").textContent = q.categoryName;
-            document.getElementById("quiz-diff-badge").textContent = `難易度: ${q.difficulty}`;
-            document.getElementById("question-text").textContent = q.question;
+            const q = currentQuizList[currentQuestionIndex];
+            
+            document.getElementById('permalink-label').innerText = `問 ${currentQuestionIndex + 1} / ${currentQuizList.length} （問題ID: #${q.id}）`;
+            document.getElementById('quiz-category-badge').innerText = q.categoryName;
+            document.getElementById('quiz-diff-badge').innerText = `難易度: ${q.difficulty}`;
+            document.getElementById('question-text').innerText = q.question;
 
-            const container = document.getElementById("options-container");
-            container.innerHTML = "";
-            document.getElementById("explanation-box").classList.add("hidden");
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
 
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement("button");
-                btn.className = "w-full text-left bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 rounded-2xl p-4 font-medium transition text-slate-800 text-sm leading-relaxed flex items-start space-x-3";
-                btn.innerHTML = `
-                    <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">${idx + 1}</span>
-                    <span>${opt}</span>
-                `;
+            q.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 bg-white hover:bg-brand-50 hover:border-brand-300 font-medium text-sm text-slate-700 transition flex items-start space-x-3 shadow-sm";
                 btn.onclick = () => checkAnswer(idx);
-                container.appendChild(btn);
+                btn.innerHTML = `
+                    <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">${idx + 1}</span>
+                    <span class="flex-grow">${optText}</span>
+                `;
+                optsContainer.appendChild(btn);
             });
+
+            document.getElementById('explanation-box').classList.add('hidden');
         }
 
-        // 回答判定
         function checkAnswer(selectedIndex) {
-            if (isAnswered) return;
-            isAnswered = true;
-
-            const q = currentPool[currentIndex];
+            const q = currentQuizList[currentQuestionIndex];
             const isCorrect = selectedIndex === q.answer;
 
-            const box = document.getElementById("explanation-box");
-            const badge = document.getElementById("result-badge");
+            const optsContainer = document.getElementById('options-container');
+            const buttons = optsContainer.querySelectorAll('button');
 
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === q.answer) {
+                    btn.className = "w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold text-sm flex items-start space-x-3 shadow-sm";
+                } else if (idx === selectedIndex && !isCorrect) {
+                    btn.className = "w-full text-left p-4 rounded-xl border-2 border-rose-400 bg-rose-50 text-rose-900 font-medium text-sm flex items-start space-x-3 shadow-sm";
+                } else {
+                    btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 text-sm flex items-start space-x-3 opacity-60";
+                }
+            });
+
+            const resultBadge = document.getElementById('result-badge');
             if (isCorrect) {
                 score++;
-                badge.className = "p-4 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center space-x-2";
-                badge.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i><span>正解です！（正解肢: 選択肢 ${q.answer + 1}）</span>`;
+                resultBadge.className = "p-4 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center space-x-2";
+                resultBadge.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i><span>正解です！大変素晴らしい理解度です。</span>`;
+                // 正解したら復習リストから除外
                 wrongQuestions = wrongQuestions.filter(id => id !== q.id);
             } else {
-                badge.className = "p-4 rounded-xl text-sm font-bold bg-rose-100 text-rose-800 border border-rose-200 flex items-center space-x-2";
-                badge.innerHTML = `<i class="fa-solid fa-circle-xmark text-xl"></i><span>不正解です… （正解: 選択肢 ${q.answer + 1}）</span>`;
+                resultBadge.className = "p-4 rounded-xl text-sm font-bold bg-rose-100 text-rose-800 border border-rose-300 flex items-center space-x-2";
+                resultBadge.innerHTML = `<i class="fa-solid fa-circle-xmark text-xl"></i><span>不正解です。解説を確認して復習しましょう。</span>`;
+                // 不正解なら復習リストに追加
                 if (!wrongQuestions.includes(q.id)) {
                     wrongQuestions.push(q.id);
                 }
             }
+            localStorage.setItem('fp2_wrong_questions', JSON.stringify(wrongQuestions));
 
-            localStorage.setItem("fp2_review_list", JSON.stringify(wrongQuestions));
-            updateHeaderInfo();
+            document.getElementById('exp-reason').innerText = q.explanation.reason;
+            document.getElementById('exp-trap').innerText = q.explanation.trap;
+            document.getElementById('exp-law').innerText = q.explanation.law;
 
-            // 解説文のセット
-            document.getElementById("exp-reason").textContent = q.explanation.reason;
-            document.getElementById("exp-trap").textContent = q.explanation.trap;
-            document.getElementById("exp-law").textContent = q.explanation.law;
-
-            document.getElementById("random-ad-box-1").innerHTML = getRandomAd();
-
-            // 選択肢ボタンの状態変更
-            const container = document.getElementById("options-container");
-            Array.from(container.children).forEach((btn, idx) => {
-                btn.disabled = true;
-                btn.classList.remove("hover:bg-brand-50", "hover:border-brand-300");
-                if (idx === q.answer) {
-                    btn.classList.add("bg-emerald-50", "border-emerald-500", "ring-2", "ring-emerald-400");
-                } else if (idx === selectedIndex) {
-                    btn.classList.add("bg-rose-50", "border-rose-400");
-                }
-            });
-
-            box.classList.remove("hidden");
-            box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            document.getElementById('random-ad-box-1').innerHTML = getRandomAd();
+            document.getElementById('explanation-box').classList.remove('hidden');
         }
 
-        // 次の問題へ
         function nextQuestion() {
-            currentIndex++;
-            if (currentIndex < currentPool.length) {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizList.length) {
                 renderQuestion();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 showResult();
             }
         }
 
-        // 結果画面表示
         function showResult() {
-            document.getElementById("screen-quiz").classList.add("hidden");
-            document.getElementById("screen-result").classList.remove("hidden");
-            document.getElementById("result-score").textContent = score;
-            document.getElementById("result-total").textContent = currentPool.length;
-            document.getElementById("random-ad-box-2").innerHTML = getRandomAd();
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
 
-            setTimeout(() => {
-                openAdModal();
-            }, 500);
-        }
+            document.getElementById('result-score').innerText = score;
+            document.getElementById('result-total').innerText = currentQuizList.length;
 
-        // ホーム画面へ戻る
-        function returnHome() {
-            document.getElementById("screen-quiz").classList.add("hidden");
-            document.getElementById("screen-result").classList.add("hidden");
-            document.getElementById("screen-home").classList.remove("hidden");
-            updateHeaderInfo();
-        }
+            document.getElementById('random-ad-box-2').innerHTML = getRandomAd();
 
-        // キーボードショートカット対応 (1~4で選択, Enterで次へ)
-        document.addEventListener("keydown", (e) => {
-            const quizScreen = document.getElementById("screen-quiz");
-            if (quizScreen.classList.contains("hidden")) return;
-
-            if (!isAnswered && ["1", "2", "3", "4"].includes(e.key)) {
-                const idx = parseInt(e.key) - 1;
-                const container = document.getElementById("options-container");
-                if (container.children[idx]) {
-                    checkAnswer(idx);
-                }
-            } else if (isAnswered && e.key === "Enter") {
-                nextQuestion();
+            // 適宜ポッアップ広告モーダル表示
+            if (Math.random() < 0.5) {
+                setTimeout(() => {
+                    openAdModal();
+                }, 600);
             }
-        });
-
-        // モーダル表示関数
-        function openAdModal() {
-            document.getElementById("random-ad-box-modal").innerHTML = getRandomAd();
-            document.getElementById("ad-modal").classList.remove("hidden");
         }
-        function closeAdModal() { document.getElementById("ad-modal").classList.add("hidden"); }
-        function openContactModal() { document.getElementById("contact-modal").classList.remove("hidden"); }
-        function closeContactModal() { document.getElementById("contact-modal").classList.add("hidden"); }
-        function openPrivacyModal() { document.getElementById("privacy-modal").classList.remove("hidden"); }
-        function closePrivacyModal() { document.getElementById("privacy-modal").classList.add("hidden"); }
 
-        // 初期表示
-        window.onload = function() {
-            updateHeaderInfo();
-        };
+        // X（Twitter）シェア機能
+        function shareOnX() {
+            const total = currentQuizList.length;
+            const percentage = Math.round((score / total) * 100);
+            const siteUrl = "https://fp2-study-site.vercel.app/";
+            
+            let categoryLabel = "全6分野";
+            const categoryMap = {
+                'life': 'ライフプランニングと資金計画',
+                'risk': 'リスク管理',
+                'financial': '金融資産運用',
+                'tax': 'タックスプランニング',
+                'realestate': '不動産',
+                'inheritance': '相続・事業承継'
+            };
+            if (selectedCategory in categoryMap) {
+                categoryLabel = categoryMap[selectedCategory];
+            }
+
+            const text = `【FP2級勉強サイト】\n${categoryLabel}の四肢択一演習を実施しました！\n\n正答率: ${percentage}% (${score}/${total}問正解)\nスキマ時間に無料で本番レベルの過去問演習ができる！\n`;
+            const hashtags = "FP2級,FP2級勉強サイト,資格勉強";
+
+            const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(siteUrl)}&hashtags=${encodeURIComponent(hashtags)}`;
+            window.open(shareUrl, '_blank', 'noopener,noreferrer');
+        }
+
+        // モーダル操作関数
+        function openAdModal() {
+            document.getElementById('random-ad-box-modal').innerHTML = getRandomAd();
+            document.getElementById('ad-modal').classList.remove('hidden');
+        }
+        function closeAdModal() {
+            document.getElementById('ad-modal').classList.add('hidden');
+        }
+
+        function openContactModal() {
+            document.getElementById('contact-modal').classList.remove('hidden');
+        }
+        function closeContactModal() {
+            document.getElementById('contact-modal').classList.add('hidden');
+        }
+
+        function openPrivacyModal() {
+            document.getElementById('privacy-modal').classList.remove('hidden');
+        }
+        function closePrivacyModal() {
+            document.getElementById('privacy-modal').classList.add('hidden');
+        }
+
+        // 初期化
+        updateHeaderUI();
     </script>
 </body>
 </html>
